@@ -1,30 +1,42 @@
+
+
+
+
 // CANVAS
 const canvas = document.querySelector('canvas');
 const ctx = canvas.getContext('2d');
-
+const title = document.querySelector('h1');
 //Listener
 document.addEventListener('keydown', keyPush);
 
-// PLAYER
-const snakeSize = 50;
-let snakePosX = 0;
-let snakePosY = canvas.height / 2;
-let snakeSpeed = 50;
-let velocityX = 0;
-let velocityY = 0;
+//game 
 
+
+let score = 0;
+const fps = 22;
+const snakeSize = 50;
 const tileCountX = canvas.width / snakeSize;
 const tileCountY = canvas.height / snakeSize;
 
+// PLAYER
+let snakePosX = 0;
+let snakePosY = canvas.height / 2;
+let snakeSpeed = snakeSize;
+let foodPosX = 400;
+let foodPosY = 100;
+
+let velocityX = 0;
+let velocityY = 0;
 
 //loop
 function gameLoop() {
     drawStuff();
     moveStuff();
-    setTimeout(gameLoop, 1000 / 20);
+    setTimeout(gameLoop, 1000 / fps);
     // requestAnimationFrame(gameLoop);
 }
 
+resetFood();
 gameLoop();
 
 
@@ -32,6 +44,7 @@ gameLoop();
 function moveStuff() {
     snakePosX += snakeSpeed * velocityX;
     snakePosY += snakeSpeed * velocityY;
+    //wall collision
     if (snakePosX > canvas.width - snakeSize) {
         snakePosX = 0;
     }
@@ -44,6 +57,12 @@ function moveStuff() {
     if (snakePosY < 0) {
         snakePosY = canvas.height;
     }
+    //food collision
+    if (snakePosX === foodPosX && snakePosY === foodPosY) {
+        title.textContent = ++score
+
+        resetFood();
+    }
 }
 
 
@@ -55,18 +74,23 @@ function drawStuff() {
     //grid
     drawGrid();
 
+    //food 
+    rectangle("blue", foodPosX, foodPosY, snakeSize, snakeSize);
+
     //Snake
     rectangle("black", snakePosX, snakePosY, snakeSize, snakeSize);
 
-
-
 }
 
+function resetFood() {
+    foodPosX = Math.floor(Math.random() * tileCountX) * snakeSize;
+    foodPosY = Math.floor(Math.random() * tileCountY) * snakeSize;
+
+}
 function rectangle(color, x, y, width, height) {
     ctx.fillStyle = color;
     ctx.fillRect(x, y, width, height);
 }
-
 
 function drawGrid() {
     for (let i = 0; i < tileCountX; i++) {
@@ -76,6 +100,10 @@ function drawGrid() {
     }
 
 }
+
+
+
+
 //Keyboard EVERYTHING
 function keyPush(event) {
     switch (event.key) {
